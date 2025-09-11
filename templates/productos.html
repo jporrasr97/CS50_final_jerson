@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Productos{% endblock %}
+
+{% block content %}
+<h2>Productos</h2>
+
+<form method="get" class="mb-3">
+  <input type="text" name="search" placeholder="Buscar producto..." value="{{ search }}" class="form-control">
+</form>
+
+<div class="row">
+  {% for producto in productos %}
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        {% if producto.imagen_url %}
+          <img src="{{ producto.imagen_url }}" class="card-img-top" alt="{{ producto.nombre }}">
+        {% else %}
+          <img src="{{ url_for('static', filename='img/no-image.png') }}" class="card-img-top" alt="Sin imagen">
+        {% endif %}
+        <div class="card-body">
+          <h5 class="card-title">{{ producto.nombre }}</h5>
+          <p class="card-text">{{ producto.descripcion }}</p>
+          <p class="fw-bold">Q{{ producto.precio }}</p>
+          <a href="{{ url_for('carrito.agregar_al_carrito', id=producto.id) }}" class="btn btn-success">Agregar al carrito</a>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<h2>Confirmar Pedido</h2>
+
+{% if not current_user.is_authenticated %}
+  <div class="alert alert-warning">
+    Eres visitante, por favor ingresa tu correo para continuar con la compra.
+  </div>
+  <form method="POST">
+    <div class="mb-3">
+      <label for="email" class="form-label">Correo</label>
+      <input type="email" name="email" id="email" class="form-control" required>
+    </div>
+    <button type="submit" class="btn btn-success">Finalizar Compra</button>
+  </form>
+{% else %}
+  <p>Revisa tu pedido y confirma:</p>
+  <ul class="list-group mb-3">
+    {% for item in carrito %}
+      <li class="list-group-item d-flex justify-content-between">
+        <div>{{ item['nombre'] }} (x{{ item['cantidad'] }})</div>
+        <div>Q{{ item['precio'] * item['cantidad'] }}</div>
+      </li>
+    {% endfor %}
+    <li class="list-group-item d-flex justify-content-between">
+      <strong>Total</strong>
+      <strong>Q{{ total }}</strong>
+    </li>
+  </ul>
+  <form method="POST">
+    <button type="submit" class="btn btn-primary">Confirmar Pedido</button>
+  </form>
+{% endif %}
+{% endblock %}

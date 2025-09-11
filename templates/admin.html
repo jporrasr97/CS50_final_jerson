@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Panel de Administración{% endblock %}
+
+{% block content %}
+<h2>⚙️ Panel de Administración</h2>
+
+<ul class="nav nav-tabs" id="adminTabs">
+  <li class="nav-item">
+    <a class="nav-link active" data-bs-toggle="tab" href="#productos">Productos</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-bs-toggle="tab" href="#categorias">Categorías</a>
+  </li>
+</ul>
+
+<div class="tab-content mt-3">
+  <!-- Productos -->
+  <div class="tab-pane fade show active" id="productos">
+    <h3>Productos</h3>
+    <a href="{{ url_for('admin.agregar_producto') }}" class="btn btn-success mb-3">➕ Agregar Producto</a>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Precio</th>
+          <th>Categoría</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for producto in productos %}
+        <tr>
+          <td>{{ producto.id }}</td>
+          <td>{{ producto.nombre }}</td>
+          <td>Q{{ producto.precio }}</td>
+          <td>{{ producto.categoria.nombre if producto.categoria else "Sin categoría" }}</td>
+          <td>
+            <a href="{{ url_for('admin.editar_producto', id=producto.id) }}" class="btn btn-warning btn-sm">Editar</a>
+            <a href="{{ url_for('admin.eliminar_producto', id=producto.id) }}" class="btn btn-danger btn-sm">Eliminar</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Categorías -->
+  <div class="tab-pane fade" id="categorias">
+    <h3>Categorías</h3>
+    <a href="{{ url_for('admin.agregar_categoria') }}" class="btn btn-success mb-3">➕ Agregar Categoría</a>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for categoria in categorias %}
+        <tr>
+          <td>{{ categoria.id }}</td>
+          <td>{{ categoria.nombre }}</td>
+          <td>
+            <a href="{{ url_for('admin.editar_categoria', id=categoria.id) }}" class="btn btn-warning btn-sm">Editar</a>
+            <a href="{{ url_for('admin.eliminar_categoria', id=categoria.id) }}" class="btn btn-danger btn-sm">Eliminar</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
