@@ -82,9 +82,9 @@
       <div class="product-card card h-100 border-0 shadow-sm hover-lift">
         <div class="product-image-container position-relative overflow-hidden" style="height: 250px;">
           {% if producto.imagen_url %}
-            <img src="{{ producto.imagen_url }}" class="card-img-top w-100 h-100 object-fit-cover" alt="{{ producto.nombre }}">
+            <img src="{{ producto.imagen_url }}" class="card-img-top w-100 h-100 object-fit-cover product-image" alt="{{ producto.nombre }}" onclick="toggleDescription(this)" data-product-id="{{ producto.id }}">
           {% else %}
-            <img src="{{ url_for('static', filename='img/no-image.png') }}" class="card-img-top w-100 h-100 object-fit-cover" alt="Sin imagen">
+            <img src="{{ url_for('static', filename='img/no-image.png') }}" class="card-img-top w-100 h-100 object-fit-cover product-image" alt="Sin imagen" onclick="toggleDescription(this)" data-product-id="{{ producto.id }}">
           {% endif %}
         </div>
 
@@ -97,7 +97,7 @@
             {{ producto.nombre }}
           </h5>
 
-          <p class="card-text text-muted small mb-3 flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+          <p class="card-text text-muted small mb-3 flex-grow-1 product-description" data-product-id="{{ producto.id }}" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
             {{ producto.descripcion }}
           </p>
 
@@ -180,5 +180,16 @@
   background: transparent;
   padding: 0;
 }
+
+.product-description.expanded {
+  display: block !important;
+  -webkit-line-clamp: unset !important;
+  -webkit-box-orient: unset !important;
+  overflow: visible !important;
+  white-space: normal !important;
+}
+</style>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </style>
 {% endblock %}
