@@ -3,9 +3,161 @@
 {% block title %}Inicio - Tienda{% endblock %}
 
 {% block content %}
-<div class="text-center">
-  <h1>Bienvenido a la Tienda en Línea 🚀</h1>
-  <p>Compra herramientas y artículos para el hogar fácilmente.</p>
-  <a href="{{ url_for('productos.listar_productos') }}" class="btn btn-primary">Ver productos</a>
+<!-- Hero Section -->
+<div class="hero-section bg-primary text-white py-5 mb-4">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <h1 class="display-4 fw-bold mb-3">🛒 Tienda en Línea</h1>
+        <p class="lead mb-4">Encuentra las mejores herramientas y artículos para el hogar con envío a domicilio.</p>
+        <div class="d-flex gap-2 flex-wrap">
+          <a href="#productos" class="btn btn-light btn-lg">Ver Productos</a>
+          <a href="{{ url_for('productos.listar_productos') }}" class="btn btn-outline-light btn-lg">Explorar Todo</a>
+        </div>
+      </div>
+      <div class="col-lg-6 text-center">
+        <img src="{{ url_for('static', filename='img/shopping-cart.png') }}" alt="Shopping Cart" class="img-fluid" style="max-height: 300px;" onerror="this.style.display='none'">
+      </div>
+    </div>
+  </div>
 </div>
+
+<!-- Categories Section -->
+<div class="container mb-5">
+  <h2 class="h4 mb-4 fw-bold">Categorías</h2>
+  <div class="row g-3">
+    {% for categoria in categorias %}
+    <div class="col-lg-2 col-md-3 col-sm-4 col-6">
+      <a href="{{ url_for('productos.listar_productos', categoria=categoria.id) }}" class="text-decoration-none">
+        <div class="category-card border rounded p-3 text-center hover-shadow">
+          <div class="category-icon mb-2">
+            <i class="fas fa-tools fa-2x text-primary"></i>
+          </div>
+          <h6 class="mb-0">{{ categoria.nombre }}</h6>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Products Section -->
+<div id="productos" class="container">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="h4 mb-0 fw-bold">Productos Destacados</h2>
+    <a href="{{ url_for('productos.listar_productos') }}" class="btn btn-outline-primary">Ver Todos</a>
+  </div>
+
+  {% if productos %}
+  <div class="row g-4">
+    {% for producto in productos %}
+    <div class="col-xl-3 col-lg-4 col-md-6">
+      <div class="product-card card h-100 border-0 shadow-sm hover-lift">
+        <div class="product-image-container position-relative overflow-hidden" style="height: 250px;">
+          {% if producto.imagen_url %}
+            <img src="{{ producto.imagen_url }}" class="card-img-top w-100 h-100 object-fit-cover" alt="{{ producto.nombre }}">
+          {% else %}
+            <img src="{{ url_for('static', filename='img/no-image.png') }}" class="card-img-top w-100 h-100 object-fit-cover" alt="Sin imagen">
+          {% endif %}
+        </div>
+
+        <div class="card-body d-flex flex-column p-3">
+          {% if producto.categoria %}
+            <span class="badge bg-light text-dark mb-2 align-self-start">{{ producto.categoria.nombre }}</span>
+          {% endif %}
+
+          <h5 class="card-title mb-2 fw-bold text-truncate" title="{{ producto.nombre }}">
+            {{ producto.nombre }}
+          </h5>
+
+          <p class="card-text text-muted small mb-3 flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+            {{ producto.descripcion }}
+          </p>
+
+          <div class="mt-auto">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <span class="h5 text-primary fw-bold mb-0">Q{{ producto.precio }}</span>
+            </div>
+
+            <div class="d-flex gap-2">
+              <a href="{{ url_for('carrito.agregar_al_carrito', id=producto.id) }}" class="btn btn-outline-primary btn-sm flex-fill">
+                <i class="fas fa-cart-plus me-1"></i>Agregar al Carrito
+              </a>
+              <a href="{{ url_for('carrito.comprar_ahora', id=producto.id) }}" class="btn btn-primary btn-sm flex-fill">
+                <i class="fas fa-bolt me-1"></i>Comprar Ahora
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-5">
+    <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+    <h4 class="text-muted">No hay productos disponibles</h4>
+    <p class="text-muted">Vuelve pronto para ver nuestros productos.</p>
+  </div>
+  {% endif %}
+</div>
+
+<style>
+.hero-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 0 0 2rem 2rem;
+}
+
+.category-card {
+  transition: all 0.3s ease;
+  height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.category-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+}
+
+.product-card {
+  transition: all 0.3s ease;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+}
+
+.product-image-container {
+  border-radius: 12px 12px 0 0;
+}
+
+/* Removed overlay styles */
+
+.hover-lift:hover {
+  transform: translateY(-5px);
+}
+
+.hover-shadow:hover {
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+}
+
+.object-fit-cover {
+  object-fit: cover;
+}
+
+.transition-all {
+  transition: all 0.3s ease;
+}
+
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+</style>
 {% endblock %}

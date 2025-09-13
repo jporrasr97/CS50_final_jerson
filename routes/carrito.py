@@ -37,6 +37,28 @@ def agregar_al_carrito(id):
         })
 
     session.modified = True
+    # Redirigir de vuelta a la página de productos en lugar del carrito
+    return redirect(url_for('productos.listar_productos'))
+
+@carrito_bp.route('/comprar-ahora/<int:id>')
+def comprar_ahora(id):
+    init_carrito()
+    producto = Producto.query.get_or_404(id)
+
+    # buscar si ya está en el carrito
+    for item in session["carrito"]:
+        if item['id'] == producto.id:
+            item['cantidad'] += 1
+            break
+    else:
+        session["carrito"].append({
+            'id': producto.id,
+            'nombre': producto.nombre,
+            'precio': producto.precio,
+            'cantidad': 1
+        })
+
+    session.modified = True
     return redirect(url_for('carrito.ver_carrito'))
 
 @carrito_bp.route('/aumentar/<int:id>')

@@ -2,7 +2,7 @@
 import os
 from flask import Flask, render_template, redirect, url_for
 from flask_login import LoginManager
-from models.models import db, Usuario
+from models.models import db, Usuario, Producto, Categoria
 from routes.auth import auth_bp
 from routes.productos import productos_bp
 from routes.carrito import carrito_bp
@@ -68,7 +68,12 @@ def create_app():
     def home():
         if Usuario.query.count() == 0:
             return redirect(url_for('auth.registro'))
-        return render_template('index.html')
+
+        # Obtener productos destacados (últimos 12 productos)
+        productos = Producto.query.order_by(Producto.id.desc()).limit(12).all()
+        categorias = Categoria.query.all()
+
+        return render_template('index.html', productos=productos, categorias=categorias)
 
     # Crear tablas si no existen
     with app.app_context():
