@@ -1,6 +1,7 @@
 # routes/carrito.py
 from flask import Blueprint, render_template, session, redirect, url_for, flash, request, current_app
-from models.models import Producto
+from flask_login import current_user, login_required
+from models.models import db, Producto, Pedido, OrderItem
 from flask_mail import Message
 from extensions import mail  # ver paso 2
 
@@ -38,6 +39,27 @@ def agregar_al_carrito(id):
     session.modified = True
     return redirect(url_for('carrito.ver_carrito'))
 
+@carrito_bp.route('/aumentar/<int:id>')
+def aumentar_cantidad(id):
+    init_carrito()
+    for item in session["carrito"]:
+        if item['id'] == id:
+            item['cantidad'] += 1
+            break
+    session.modified = True
+    return redirect(url_for('carrito.ver_carrito'))
+
+@carrito_bp.route('/disminuir/<int:id>')
+def disminuir_cantidad(id):
+    init_carrito()
+    for item in session["carrito"]:
+        if item['id'] == id:
+            if item['cantidad'] > 1:
+                item['cantidad'] -= 1
+            break
+    session.modified = True
+    return redirect(url_for('carrito.ver_carrito'))
+
 @carrito_bp.route('/eliminar/<int:id>')
 def eliminar_del_carrito(id):
     init_carrito()
@@ -46,6 +68,12 @@ def eliminar_del_carrito(id):
     return redirect(url_for('carrito.ver_carrito'))
 
 # ACEPTA GET y POST para evitar "Method Not Allowed" y enviar el pedido por correo
+@carrito_bp.route('/pedidos')
+@login_required
+def ver_pedidos():
+    pedidos = Pedido.query.filter_by(usuario_id=current_user.id).order_by(Pedido.fecha.desc()).all()
+    return render_template('pedidos.html', pedidos=pedidos)
+
 @carrito_bp.route('/checkout', methods=['GET', 'POST'])
 def checkout():
     init_carrito()
@@ -61,6 +89,7 @@ def checkout():
     # POST: Confirmar pedido
     direccion = request.form.get('direccion', '').strip()
     telefono = request.form.get('telefono', '').strip()
+    email_cliente = request.form.get('email', '').strip() if not current_user.is_authenticated else current_user.email
 
     errores = []
     if not carrito:
@@ -69,6 +98,8 @@ def checkout():
         errores.append("La dirección de envío es obligatoria.")
     if not telefono:
         errores.append("El número de teléfono es obligatorio.")
+    if not current_user.is_authenticated and not email_cliente:
+        errores.append("El correo electrónico es obligatorio para visitantes.")
     # Validación básica de teléfono (al menos 8 dígitos)
     if telefono and sum(c.isdigit() for c in telefono) < 8:
         errores.append("El número de teléfono parece inválido.")
@@ -78,8 +109,30 @@ def checkout():
     if errores:
         for e in errores:
             flash(e)
-        return render_template('checkout.html', carrito=carrito, total=total,
-                               direccion=direccion, telefono=telefono), 400
+        return render_template('carrito.html', carrito=carrito, total=total,
+                               direccion=direccion, telefono=telefono, email=email_cliente), 400
+
+    # Guardar pedido en BD
+    nuevo_pedido = Pedido(
+        usuario_id=current_user.id if current_user.is_authenticated else None,
+        email_cliente=email_cliente if not current_user.is_authenticated else None,
+        total=total
+    )
+    db.session.add(nuevo_pedido)
+    db.session.flush()  # Para obtener el ID del pedido
+
+    # Guardar items del pedido
+    for item in carrito:
+        producto = Producto.query.get(item['id'])
+        order_item = OrderItem(
+            pedido_id=nuevo_pedido.id,
+            producto_id=item['id'],
+            cantidad=item['cantidad'],
+            precio_unitario=item['precio']
+        )
+        db.session.add(order_item)
+
+    db.session.commit()
 
     # Construir el correo
     subject = "Nuevo pedido - Tienda en Línea"
@@ -91,7 +144,8 @@ def checkout():
     text_body = (
         f"Nuevo pedido:\n\n"
         f"Dirección de envío: {direccion}\n"
-        f"Teléfono: {telefono}\n\n"
+        f"Teléfono: {telefono}\n"
+        f"Email cliente: {email_cliente}\n\n"
         f"Productos:\n{texto_items}\n\n"
         f"Total: Q{total}\n"
     )
@@ -104,7 +158,8 @@ def checkout():
     html_body = f"""
     <h3>Nuevo pedido</h3>
     <p><strong>Dirección de envío:</strong> {direccion}<br>
-       <strong>Teléfono:</strong> {telefono}</p>
+       <strong>Teléfono:</strong> {telefono}<br>
+       <strong>Email cliente:</strong> {email_cliente}</p>
     <table border="1" cellpadding="6" cellspacing="0">
       <thead>
         <tr><th>Producto</th><th>Cantidad</th><th>Precio</th><th>Subtotal</th></tr>
@@ -131,5 +186,5 @@ def checkout():
     except Exception as e:
         current_app.logger.exception("Error enviando correo de pedido")
         flash("No pudimos enviar el correo del pedido. Intenta más tarde.")
-        return render_template('checkout.html', carrito=carrito, total=total,
-                               direccion=direccion, telefono=telefono), 500
+        return render_template('carrito.html', carrito=carrito, total=total,
+                               direccion=direccion, telefono=telefono, email=email_cliente), 500

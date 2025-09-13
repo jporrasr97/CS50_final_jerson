@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Mis Pedidos{% endblock %}
+
+{% block content %}
+<h2>Mis Pedidos</h2>
+
+{% if pedidos %}
+  <div class="row">
+    {% for pedido in pedidos %}
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Pedido #{{ pedido.id }}</h5>
+            <small class="text-muted">{{ pedido.fecha.strftime('%d/%m/%Y %H:%M') }}</small>
+          </div>
+          <div class="card-body">
+            <p><strong>Estado:</strong> {{ pedido.estado }}</p>
+            <p><strong>Total:</strong> Q{{ pedido.total }}</p>
+            <h6>Productos:</h6>
+            <ul class="list-group list-group-flush">
+              {% for item in pedido.items %}
+                <li class="list-group-item d-flex justify-content-between">
+                  <div>{{ item.producto.nombre }} x{{ item.cantidad }}</div>
+                  <div>Q{{ item.precio_unitario * item.cantidad }}</div>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p class="text-center">Aún no has realizado ningún pedido.</p>
+  <a href="{{ url_for('productos.listar_productos') }}" class="btn btn-primary">Ver Productos</a>
+{% endif %}
+{% endblock %}

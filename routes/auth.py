@@ -25,7 +25,10 @@ def registro():
         email = request.form['email']
         password = generate_password_hash(request.form['password'])
 
-        nuevo_usuario = Usuario(nombre=nombre, email=email, password=password)
+        # Si es el primer usuario, hacerlo admin
+        rol = 'admin' if Usuario.query.count() == 0 else 'cliente'
+
+        nuevo_usuario = Usuario(nombre=nombre, email=email, password=password, rol=rol)
         db.session.add(nuevo_usuario)
         db.session.commit()
 

@@ -9,6 +9,12 @@ from routes.carrito import carrito_bp
 from routes.admin import admin_bp
 from extensions import mail  # NUEVO: instancia de Flask-Mail
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except Exception:
+    pass
+
 login_manager = LoginManager()
 
 def create_app():
@@ -29,12 +35,12 @@ def create_app():
     app.config.update(
         MAIL_SERVER=os.getenv('MAIL_SERVER', 'smtp.gmail.com'),
         MAIL_PORT=int(os.getenv('MAIL_PORT', 587)),
-        MAIL_USE_TLS=os.getenv('MAIL_USE_TLS', 'true').lower() in ('true', '1', 'yes'),
-        MAIL_USERNAME=os.getenv('MAIL_USERNAME', 'jersonprs31@gmail.com'),
-        MAIL_PASSWORD=os.getenv('MAIL_PASSWORD'),  # contraseña de aplicación de Gmail
-        MAIL_DEFAULT_SENDER=os.getenv('MAIL_DEFAULT_SENDER', os.getenv('MAIL_USERNAME', 'jersonprs31@gmail.com')),
-        # Opcional en desarrollo: suprime envío si no tienes credenciales
-        # MAIL_SUPPRESS_SEND=os.getenv('MAIL_PASSWORD') is None
+        MAIL_USE_TLS=os.getenv('MAIL_USE_TLS', 'true').lower() in ('true', '1', 'yes', 'y', 'on'),
+        MAIL_USERNAME=os.getenv('MAIL_USERNAME'),           # sin default sensible
+        MAIL_PASSWORD=os.getenv('MAIL_PASSWORD'),
+        MAIL_DEFAULT_SENDER=os.getenv('MAIL_DEFAULT_SENDER') or os.getenv('MAIL_USERNAME'),
+        # Opcional: no intentar enviar si faltan credenciales (útil en dev)
+        MAIL_SUPPRESS_SEND=not (os.getenv('MAIL_USERNAME') and os.getenv('MAIL_PASSWORD')),
     )
 
     # Inicializar extensiones

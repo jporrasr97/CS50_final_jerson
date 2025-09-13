@@ -23,6 +23,7 @@
         <li class="nav-item"><a class="nav-link" href="{{ url_for('carrito.ver_carrito') }}">Carrito</a></li>
 
         {% if current_user is defined and current_user.is_authenticated %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('carrito.ver_pedidos') }}">Mis Pedidos</a></li>
           {% if (current_user.rol|default('')) == 'admin' %}
             <!-- Usa una ruta fija para evitar BuildError si no existe el endpoint -->
             <li class="nav-item"><a class="nav-link" href="/admin">Admin</a></li>
