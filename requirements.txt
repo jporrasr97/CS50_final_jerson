@@ -1,5 +1,6 @@
 flask
-flask_sqlalchemy
-flask_login
-flask_mail
+flask-sqlalchemy
+flask-login
+flask-mail
 python-dotenv
+gunicorn
