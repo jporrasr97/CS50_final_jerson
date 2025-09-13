@@ -79,7 +79,7 @@
   <div class="row g-4">
     {% for producto in productos %}
     <div class="col-xl-3 col-lg-4 col-md-6">
-      <div class="product-card card h-100 border-0 shadow-sm hover-lift">
+      <div class="product-card card h-100 border-0 shadow-sm hover-lift" data-product-id="{{ producto.id }}">
         <div class="product-image-container position-relative overflow-hidden" style="height: 250px;">
           {% if producto.imagen_url %}
             <img src="{{ producto.imagen_url }}" class="card-img-top w-100 h-100 object-fit-cover product-image" alt="{{ producto.nombre }}" onclick="toggleDescription(this)" data-product-id="{{ producto.id }}">
@@ -147,6 +147,10 @@
   overflow: hidden;
 }
 
+.product-card.expanded {
+  transition: all 0.4s ease;
+}
+
 .product-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
@@ -181,7 +185,14 @@
   padding: 0;
 }
 
-.product-description.expanded {
+.product-card.expanded {
+  position: relative;
+  z-index: 10;
+  transform: scale(1.05);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2) !important;
+}
+
+.product-card.expanded .product-description {
   display: block !important;
   -webkit-line-clamp: unset !important;
   -webkit-box-orient: unset !important;
