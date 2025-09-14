@@ -1,6 +1,7 @@
 # routes/carrito.py
 from flask import Blueprint, render_template, session, redirect, url_for, flash, request, current_app
 from flask_login import current_user, login_required
+from flask_wtf.csrf import csrf_exempt
 from models.models import db, Producto, Pedido, OrderItem
 from flask_mail import Message
 from extensions import mail  # ver paso 2
@@ -97,6 +98,7 @@ def ver_pedidos():
     return render_template('pedidos.html', pedidos=pedidos)
 
 @carrito_bp.route('/checkout', methods=['GET', 'POST'])
+@csrf_exempt
 def checkout():
     init_carrito()
     carrito = session["carrito"]
