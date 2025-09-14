@@ -9,7 +9,7 @@
     Eres visitante, por favor ingresa tu correo para continuar con la compra.
   </div>
   <form method="POST">
-    {{ csrf_token() }}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     <div class="mb-3">
       <label for="email" class="form-label">Correo</label>
       <input type="email" name="email" id="email" class="form-control" required>
@@ -31,7 +31,7 @@
     </li>
   </ul>
   <form method="POST">
-    {{ csrf_token() }}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     <button type="submit" class="btn btn-primary">Confirmar Pedido</button>
   </form>
 {% endif %}
