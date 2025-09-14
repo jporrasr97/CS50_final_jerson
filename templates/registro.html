@@ -4,7 +4,6 @@
 {% block content %}
 <h2>Registro</h2>
 <form method="POST">
-  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
   <div class="mb-3">
     <label for="nombre" class="form-label">Nombre</label>
     <input type="text" name="nombre" id="nombre" class="form-control" required>

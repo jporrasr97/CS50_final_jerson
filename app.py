@@ -3,7 +3,6 @@ import os
 import secrets
 from flask import Flask, render_template, redirect, url_for
 from flask_login import LoginManager
-from flask_wtf.csrf import CSRFProtect
 from models.models import db, Usuario, Producto, Categoria
 from routes.auth import auth_bp
 from routes.productos import productos_bp
@@ -18,7 +17,6 @@ except Exception:
     pass
 
 login_manager = LoginManager()
-csrf = CSRFProtect()
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
@@ -50,7 +48,6 @@ def create_app():
     db.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)
-    csrf.init_app(app)
     limiter.init_app(app)
     talisman.init_app(app, content_security_policy=None)  # Adjust CSP as needed
 
