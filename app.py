@@ -4,6 +4,7 @@ import secrets
 from flask import Flask, render_template, redirect, url_for
 from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
+from flask_wtf import csrf_token
 from models.models import db, Usuario, Producto, Categoria
 from routes.auth import auth_bp
 from routes.productos import productos_bp
@@ -53,6 +54,7 @@ def create_app():
     csrf.init_app(app)
     limiter.init_app(app)
     talisman.init_app(app, content_security_policy=None)  # Adjust CSP as needed
+    app.jinja_env.globals['csrf_token'] = csrf_token
 
     login_manager.login_view = 'auth.login'
 
