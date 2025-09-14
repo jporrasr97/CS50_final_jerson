@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}{{ producto.nombre }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header bg-light py-4 mb-4">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-6">
+        <h1 class="h3 mb-0 fw-bold">
+          <i class="fas fa-box me-2 text-primary"></i>{{ producto.nombre }}
+        </h1>
+        <p class="text-muted mb-0">Detalles del producto</p>
+      </div>
+      <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-0 justify-content-end">
+            <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Inicio</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('productos.listar_productos') }}">Productos</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ producto.nombre }}</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <!-- Product Image -->
+    <div class="col-lg-6 mb-4">
+      <div class="product-image-container bg-light rounded shadow-sm p-4 text-center">
+        {% if producto.imagen_url %}
+          <img src="{{ producto.imagen_url }}" class="img-fluid rounded" alt="{{ producto.nombre }}" style="max-height: 500px;">
+        {% else %}
+          <img src="{{ url_for('static', filename='img/no-image.png') }}" class="img-fluid rounded" alt="Sin imagen" style="max-height: 500px;">
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Product Details -->
+    <div class="col-lg-6">
+      <div class="product-details">
+        {% if producto.categoria %}
+          <span class="badge bg-primary mb-3">{{ producto.categoria.nombre }}</span>
+        {% endif %}
+
+        <h2 class="h3 mb-3 fw-bold">{{ producto.nombre }}</h2>
+
+        <div class="price-section mb-4">
+          <h3 class="h2 text-primary fw-bold mb-0">Q{{ producto.precio }}</h3>
+        </div>
+
+        <div class="description-section mb-4">
+          <h4 class="h5 mb-3 fw-bold">Descripción</h4>
+          <p class="text-muted lh-base">{{ producto.descripcion }}</p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <div class="d-grid gap-3">
+            <a href="{{ url_for('carrito.agregar_al_carrito', id=producto.id) }}" class="btn btn-outline-primary btn-lg">
+              <i class="fas fa-cart-plus me-2"></i>Agregar al Carrito
+            </a>
+            <a href="{{ url_for('carrito.comprar_ahora', id=producto.id) }}" class="btn btn-primary btn-lg">
+              <i class="fas fa-bolt me-2"></i>Comprar Ahora
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Back to Products -->
+  <div class="row mt-5">
+    <div class="col-12 text-center">
+      <a href="{{ url_for('productos.listar_productos') }}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Volver a Productos
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+.page-header {
+  border-radius: 0 0 1rem 1rem;
+}
+
+.product-image-container {
+  border-radius: 12px;
+}
+
+.product-details .badge {
+  font-size: 0.875rem;
+}
+
+.price-section {
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 1rem;
+}
+
+.description-section {
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 1rem;
+}
+
+.action-buttons .btn {
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.breadcrumb {
+  background: transparent;
+  padding: 0;
+}
+</style>
+{% endblock %}

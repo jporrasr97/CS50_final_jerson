@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, abort
 from models.models import db, Producto, Categoria
 
 productos_bp = Blueprint('productos', __name__)
@@ -17,3 +17,8 @@ def listar_productos():
     productos = query.all()
     categorias = Categoria.query.all()
     return render_template("productos.html", productos=productos, categorias=categorias, search=search, categoria_id=categoria_id)
+
+@productos_bp.route('/producto/<int:id>')
+def detalle_producto(id):
+    producto = Producto.query.get_or_404(id)
+    return render_template("producto_detalle.html", producto=producto)
