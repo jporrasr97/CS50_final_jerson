@@ -6,13 +6,21 @@
 
 {% if not current_user.is_authenticated %}
   <div class="alert alert-warning">
-    Eres visitante, por favor ingresa tu correo para continuar con la compra.
+    Eres visitante, por favor ingresa tu información para continuar con la compra.
   </div>
   <form method="POST">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     <div class="mb-3">
       <label for="email" class="form-label">Correo</label>
       <input type="email" name="email" id="email" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label for="direccion" class="form-label">Dirección de envío</label>
+      <input type="text" name="direccion" id="direccion" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label for="telefono" class="form-label">Número de teléfono</label>
+      <input type="tel" name="telefono" id="telefono" class="form-control" required>
     </div>
     <button type="submit" class="btn btn-success">Finalizar Compra</button>
   </form>
