@@ -2,5 +2,8 @@ flask
 flask-sqlalchemy
 flask-login
 flask-mail
+flask-wtf
+flask-limiter
+flask-talisman
 python-dotenv
 gunicorn

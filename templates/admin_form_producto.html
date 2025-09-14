@@ -4,6 +4,7 @@
 <div class="container mt-5">
     <h2>Agregar Producto</h2>
     <form method="POST" action="{{ url_for('admin.agregar_producto') }}">
+        {{ csrf_token() }}
         <div class="mb-3">
             <label for="nombre" class="form-label">Nombre del producto</label>
             <input type="text" class="form-control" id="nombre" name="nombre" required>

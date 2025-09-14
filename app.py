@@ -1,13 +1,15 @@
 # app.py
 import os
+import secrets
 from flask import Flask, render_template, redirect, url_for
 from flask_login import LoginManager
+from flask_wtf.csrf import CSRFProtect
 from models.models import db, Usuario, Producto, Categoria
 from routes.auth import auth_bp
 from routes.productos import productos_bp
 from routes.carrito import carrito_bp
 from routes.admin import admin_bp
-from extensions import mail  # NUEVO: instancia de Flask-Mail
+from extensions import mail, limiter, talisman  # NUEVO: instancia de Flask-Mail, Limiter y Talisman
 
 try:
     from dotenv import load_dotenv
@@ -16,12 +18,13 @@ except Exception:
     pass
 
 login_manager = LoginManager()
+csrf = CSRFProtect()
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
 
     # Config básica
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'cambia-esto')
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', secrets.token_hex(32))
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
         'DATABASE_URI',
         'sqlite:///' + os.path.join(app.instance_path, 'tienda.db')
@@ -47,6 +50,9 @@ def create_app():
     db.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)
+    csrf.init_app(app)
+    limiter.init_app(app)
+    talisman.init_app(app, content_security_policy=None)  # Adjust CSP as needed
 
     login_manager.login_view = 'auth.login'
 
@@ -78,6 +84,16 @@ def create_app():
     # Crear tablas si no existen
     with app.app_context():
         db.create_all()
+
+    # Error handlers
+    @app.errorhandler(404)
+    def not_found(error):
+        return render_template('404.html'), 404
+
+    @app.errorhandler(500)
+    def internal_error(error):
+        db.session.rollback()
+        return render_template('500.html'), 500
 
     return app
 
