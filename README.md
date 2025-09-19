@@ -177,18 +177,7 @@ To enable email notifications:
 - Mobile-responsive design improvements
 - API endpoints for mobile app integration
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is Opensource
 
-## Support
-
-For questions or issues, please open an issue on the GitHub repository or contact the development team.
