@@ -301,3 +301,69 @@ body {
   align-items: center;
   gap: 6px;
 }
+/* Responsive/mobile improvements */
+@media (hover: none) and (pointer: coarse) {
+  /* Disable hover-only motion on touch devices */
+  .hover-lift:hover,
+  .product-card:hover {
+    transform: none;
+    box-shadow: none !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  html, body { overflow-x: hidden; }
+
+  /* Navbar tweaks */
+  .navbar-brand { font-size: 1rem; }
+  .navbar-nav { gap: 8px; }
+  .navbar-nav .nav-link { padding: 6px 8px; }
+
+  /* Cart counter size/position on very small screens */
+  .nav-link.nav-cart .contador {
+    width: 14px;
+    height: 14px;
+    font-size: 10px;
+    top: -6px !important;
+    right: 1px !important;
+  }
+
+  /* Hero section adjustments */
+  .hero-section {
+    padding: 2rem 0 !important;
+    border-radius: 0 0 1rem 1rem !important;
+  }
+  .hero-section .display-4 { font-size: 1.75rem; }
+  .hero-section .lead { font-size: 1rem; }
+
+  /* Product card compact layout */
+  .product-image-container { height: 180px !important; }
+  .product-card .card-body { padding: 0.75rem !important; }
+  .product-card .card-title { font-size: 1rem; }
+  .product-card .btn { font-size: 0.9rem; }
+
+  /* Quantity controls should span container width on mobile */
+  .amazon-qty .input-group { max-width: 100% !important; }
+
+  /* Detail page image max height (targets only .img-fluid used there) */
+  .product-image-container .img-fluid {
+    max-height: 320px !important;
+    height: auto !important;
+    width: auto;
+    max-width: 100%;
+  }
+
+  /* Filters/header spacing */
+  .page-header { padding: 1rem !important; }
+}
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+  /* Slightly taller card images for small phones/landscape */
+  .product-image-container { height: 220px !important; }
+}
+
+/* Reduce spacing in collapsed navbar when menu is open on mobile/tablet */
+@media (max-width: 991.98px) {
+  .navbar-nav { gap: 10px; }
+  .navbar-nav .nav-link { padding: 8px 10px; }
+}
