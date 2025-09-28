@@ -9,6 +9,7 @@ from routes.productos import productos_bp
 from routes.carrito import carrito_bp
 from routes.admin import admin_bp
 from extensions import mail, limiter, talisman  # NUEVO: instancia de Flask-Mail, Limiter y Talisman
+from sqlalchemy import text
 
 try:
     from dotenv import load_dotenv
@@ -32,6 +33,10 @@ def create_app():
     # Asegúrate de que existe la carpeta instance/
     os.makedirs(app.instance_path, exist_ok=True)
 
+    # Carpeta de uploads para imágenes (drag & drop admin)
+    app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'uploads')
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
     # Config de correo (Gmail SMTP por defecto)
     app.config.update(
         MAIL_SERVER=os.getenv('MAIL_SERVER', 'smtp.gmail.com'),
@@ -42,6 +47,8 @@ def create_app():
         MAIL_DEFAULT_SENDER=os.getenv('MAIL_DEFAULT_SENDER') or os.getenv('MAIL_USERNAME'),
         # Opcional: no intentar enviar si faltan credenciales (útil en dev)
         MAIL_SUPPRESS_SEND=not (os.getenv('MAIL_USERNAME') and os.getenv('MAIL_PASSWORD')),
+        # Configurar backend de almacenamiento para Flask-Limiter (evita warning en dev)
+        RATELIMIT_STORAGE_URI=os.getenv('RATELIMIT_STORAGE_URI', 'memory://'),
     )
 
     # Inicializar extensiones
@@ -78,9 +85,22 @@ def create_app():
 
         return render_template('index.html', productos=productos, categorias=categorias)
 
-    # Crear tablas si no existen
+    # Favicon: evita 404 del navegador solicitando /favicon.ico
+    @app.route('/favicon.ico')
+    def favicon():
+        return redirect(url_for('static', filename='img/zapato.PNG'))
+
+    # Crear tablas si no existen y asegurar columna 'stock' en 'producto' (SQLite)
     with app.app_context():
         db.create_all()
+        try:
+            res = db.session.execute(text("PRAGMA table_info('producto')")).fetchall()
+            cols = {row[1] for row in res}  # (cid, name, type, ... )
+            if 'stock' not in cols:
+                db.session.execute(text("ALTER TABLE producto ADD COLUMN stock INTEGER NOT NULL DEFAULT 0"))
+                db.session.commit()
+        except Exception:
+            app.logger.exception("No se pudo verificar/agregar columna 'stock' en la tabla producto")
 
     # Error handlers
     @app.errorhandler(404)

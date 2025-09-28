@@ -1,1 +1,303 @@
-cd
+/* Theme inspired by Amazon */
+:root {
+  --bg-page: #e3e6e6;
+  --card: #ffffff;
+  --text: #0f1111;
+  --muted: #565959;
+  --accent: #ff9900;
+  --accent-dark: #cc7a00;
+  --primary: #0d6efd; /* Bootstrap primary for consistency */
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background: var(--bg-page);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Navbar */
+.navbar-dark.bg-dark {
+  background: #131921 !important; /* Amazon header tone */
+}
+.navbar-brand {
+  font-weight: 700;
+}
+
+/* Layout containers */
+.container .card,
+.product-card {
+  background: var(--card);
+}
+
+/* Product cards */
+.product-card {
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform .2s ease, box-shadow .2s ease;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+}
+.product-image-container {
+  border-radius: 12px 12px 0 0;
+  background: #fff;
+}
+.product-image {
+  object-fit: cover;
+}
+
+/* Price + stock */
+.h5.text-primary,
+.h2.text-primary {
+  color: #b12704 !important; /* Amazon price color */
+}
+.stock-ok {
+  color: #007600;
+}
+.stock-out {
+  color: #b12704;
+}
+
+/* Amazon-like quantity controls */
+.amazon-qty .input-group {
+  max-width: 220px;
+  margin: 0 auto;
+}
+.amazon-qty .qty-count {
+  min-width: 64px;
+  font-weight: 600;
+  background: #f8f9fa !important;
+}
+.amazon-qty .btn {
+  min-width: 40px;
+}
+.qty-minus, .qty-plus {
+  font-weight: 700;
+}
+
+/* Add to cart button */
+.btn-add-to-cart {
+  border-color: var(--accent);
+  color: var(--accent-dark);
+}
+.btn-add-to-cart:hover {
+  background: var(--accent);
+  color: #111;
+  border-color: var(--accent);
+}
+
+/* Primary actions */
+.btn-primary {
+  background: #ffa41c;
+  border-color: #ffa41c;
+  color: #111;
+}
+.btn-primary:hover, .btn-primary:focus {
+  background: #f09000;
+  border-color: #f09000;
+  color: #111;
+}
+
+/* Outlined primary (secondary CTAs) */
+.btn-outline-primary {
+  color: var(--primary);
+  border-color: var(--primary);
+}
+.btn-outline-primary:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* Filters, headers */
+.page-header {
+  background: #f8f9fa;
+  border-radius: 0 0 1rem 1rem;
+}
+.filters-section {
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,.05);
+}
+
+/* Breadcrumb reset */
+.breadcrumb {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+}
+
+/* Utility */
+.object-fit-cover { object-fit: cover; }
+.hover-lift:hover { transform: translateY(-5px); }
+.transition-all { transition: all .2s ease; }
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Cart badge positioning (kept from base) */
+.cart-badge-adjusted {
+  transform: translateX(-3px) translateY(-50%);
+}
+
+/* Admin drag & drop styles (unify across pages) */
+.border-dashed { border-style: dashed !important; }
+#dropZone.dragover {
+  background-color: #eef6ff;
+  border-color: #0d6efd !important;
+}
+
+/* Table tweaks for admin */
+.table th, .table td {
+  vertical-align: middle;
+}
+
+/* Forms */
+.form-label {
+  font-weight: 600;
+}
+
+/* Footer */
+footer.bg-dark {
+  background: #232f3e !important; /* Amazon footer tone */
+}
+/* Navbar cart icon - Amazon-like */
+.nav-cart { color: #fff !important; }
+.nav-cart .cart-label { color: #fff; line-height: 1; }
+
+.cart-icon {
+  position: relative;
+  width: 40px;
+  height: 30px;
+}
+
+/* Cart basket (skewed rectangle without top border) */
+.cart-icon::before {
+  content: "";
+  position: absolute;
+  width: 30px;
+  height: 15px;
+  border: 2px solid #ffffff;
+  border-top: none;
+  transform: skew(-15deg);
+  bottom: 8px;
+  left: 5px;
+  border-radius: 2px;
+}
+
+/* Wheels */
+.rueda {
+  position: absolute;
+  bottom: 0;
+  width: 8px;
+  height: 8px;
+  background: #ffffff;
+  border-radius: 50%;
+}
+.rueda.left { left: 5px; }
+.rueda.right { right: 5px; }
+
+/* Counter bubble */
+.contador {
+  position: absolute;
+  top: -8px;
+  left: 10px;
+  background: #f08804;
+  color: #111;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.15);
+}
+
+.nav-link.nav-cart:hover .contador {
+  filter: brightness(1.05);
+}
+/* Nav visual tweaks and counter readability */
+body {
+  font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  font-size: 15px;
+}
+
+.navbar-nav { gap: 18px; }
+
+.navbar-nav .nav-link {
+  color: #e5e5e5 !important;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link:focus {
+  color: #f08804 !important;
+  text-decoration: none;
+}
+
+/* Counter bubble: smaller, top-right, better contrast */
+.nav-link.nav-cart .contador {
+  top: -6px;
+  right: -4px;
+  left: auto;
+  background: #f08804;
+  color: #fff;
+  font-size: 11px;
+  width: 16px;
+  height: 16px;
+  box-shadow: 0 0 0 2px #131921; /* subtle outline against dark header */
+}
+
+@media (max-width: 992px) {
+  .navbar-nav { gap: 8px; }
+}
+/* Navbar cart counter refinements: position, contrast, and layering */
+.nav-link.nav-cart .contador {
+  top: -7px !important;
+  right: 2px !important;
+  left: auto !important;
+  color: #fff !important;              /* High contrast on orange */
+  background: #f08804 !important;      /* Amazon-like orange */
+  border: 1px solid rgba(255,255,255,0.85);
+  box-shadow: 0 0 0 2px #131921, 0 1px 2px rgba(0,0,0,.35);
+  width: 16px;
+  height: 16px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Improve icon + label hover feedback for all nav items */
+.navbar-nav .nav-link:hover i,
+.navbar-nav .nav-link:hover .cart-label {
+  color: #f08804 !important;
+}
+
+/* Slightly increase spacing between nav items for air */
+.navbar-nav { gap: 20px; }
+
+/* Ensure consistent alignment */
+.navbar-nav .nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}

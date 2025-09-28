@@ -1,0 +1,21 @@
+name: tienda
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - pip
+  - sqlite
+  - openssl
+  - ca-certificates
+  - setuptools
+  - wheel
+  - pip:
+    - flask
+    - flask-sqlalchemy
+    - flask-login
+    - flask-mail
+    - flask-limiter
+    - flask-talisman
+    - python-dotenv
+    - gunicorn

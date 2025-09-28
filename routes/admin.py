@@ -1,10 +1,17 @@
 from functools import wraps
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+import os
+import uuid
+from werkzeug.utils import secure_filename
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app
 from flask_login import login_required, current_user
 from models.models import db, Producto, Categoria
 
 # Prefijo /admin para todas las rutas de este blueprint
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
+
+ALLOWED_IMAGE_EXTS = {"png", "jpg", "jpeg", "gif", "webp"}
+def _allowed_image(filename: str) -> bool:
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_IMAGE_EXTS
 
 def admin_required(f):
     @wraps(f)
@@ -39,6 +46,9 @@ def agregar_producto():
         precio = request.form.get('precio', type=float)
         imagen_url = request.form.get('imagen_url')
         categoria_id = request.form.get('categoria_id', type=int)
+        stock = request.form.get('stock', type=int)
+        if stock is None:
+            stock = 0
 
         if not nombre or precio is None:
             flash("Nombre y precio son obligatorios.", "warning")
@@ -49,7 +59,8 @@ def agregar_producto():
             descripcion=descripcion,
             precio=precio,
             imagen_url=imagen_url,
-            categoria_id=categoria_id
+            categoria_id=categoria_id,
+            stock=stock
         )
         db.session.add(nuevo)
         db.session.commit()
@@ -72,7 +83,11 @@ def editar_producto(id):
         producto.precio = request.form.get('precio', type=float)
         producto.imagen_url = request.form.get('imagen_url')
         producto.categoria_id = request.form.get('categoria_id', type=int)
-
+        stock = request.form.get('stock', type=int)
+        if stock is None:
+            stock = 0
+        producto.stock = stock
+    
         db.session.commit()
         flash("Producto actualizado con éxito.", "success")
         return redirect(url_for('admin.dashboard'))
@@ -145,3 +160,26 @@ def editar_categoria(id):
         return redirect(url_for('admin.dashboard'))
 
     return render_template("admin_form_categoria.html", categoria=categoria)
+
+# -----------------------------------------
+# Upload de imágenes (Drag & Drop en admin)
+# -----------------------------------------
+@admin_bp.route('/upload-image', methods=['POST'])
+@login_required
+@admin_required
+def upload_image():
+    file = request.files.get('file')
+    if not file or file.filename == '':
+        return jsonify(ok=False, mensaje="No se envió archivo"), 400
+    if not _allowed_image(file.filename):
+        return jsonify(ok=False, mensaje="Tipo de archivo no permitido"), 400
+    filename = secure_filename(file.filename)
+    # añade un sufijo aleatorio para evitar colisiones
+    ext = filename.rsplit('.', 1)[1].lower()
+    new_name = f"{uuid.uuid4().hex}.{ext}"
+    save_dir = current_app.config.get('UPLOAD_FOLDER') or os.path.join(current_app.root_path, 'static', 'uploads')
+    os.makedirs(save_dir, exist_ok=True)
+    save_path = os.path.join(save_dir, new_name)
+    file.save(save_path)
+    public_url = url_for('static', filename=f'uploads/{new_name}', _external=False)
+    return jsonify(ok=True, url=public_url, filename=new_name), 200

@@ -24,6 +24,7 @@
           <th>ID</th>
           <th>Nombre</th>
           <th>Precio</th>
+          <th>Stock</th>
           <th>Categoría</th>
           <th></th>
         </tr>
@@ -34,6 +35,7 @@
           <td>{{ producto.id }}</td>
           <td>{{ producto.nombre }}</td>
           <td>Q{{ producto.precio }}</td>
+          <td>{{ producto.stock if producto.stock is not none else 0 }}</td>
           <td>{{ producto.categoria.nombre if producto.categoria else "Sin categoría" }}</td>
           <td>
             <a href="{{ url_for('admin.editar_producto', id=producto.id) }}" class="btn btn-warning btn-sm">Editar</a>

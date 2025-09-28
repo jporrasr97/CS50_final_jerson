@@ -58,10 +58,26 @@
 
         <!-- Action Buttons -->
         <div class="action-buttons">
+          {% set stock = (producto.stock if producto.stock is not none else 0) %}
+          <p class="small mb-2 {{ 'text-success' if stock > 0 else 'text-danger' }}">
+            {{ 'En stock' if stock > 0 else 'Agotado' }}
+          </p>
           <div class="d-grid gap-3">
-            <a href="{{ url_for('carrito.agregar_al_carrito', id=producto.id) }}" class="btn btn-outline-primary btn-lg">
+            <a href="{{ url_for('carrito.agregar_al_carrito', id=producto.id) }}"
+               class="btn btn-outline-primary btn-lg btn-add-to-cart"
+               data-product-id="{{ producto.id }}"
+               {% if stock <= 0 %}disabled aria-disabled="true"{% endif %}>
               <i class="fas fa-cart-plus me-2"></i>Agregar al Carrito
             </a>
+
+            <div class="amazon-qty d-none" data-product-id="{{ producto.id }}">
+              <div class="input-group input-group-lg">
+                <button type="button" class="btn btn-outline-secondary qty-minus" aria-label="Disminuir">−</button>
+                <span class="form-control text-center bg-light qty-count">0</span>
+                <button type="button" class="btn btn-outline-secondary qty-plus" aria-label="Aumentar">+</button>
+              </div>
+            </div>
+
             <a href="{{ url_for('carrito.comprar_ahora', id=producto.id) }}" class="btn btn-primary btn-lg">
               <i class="fas fa-bolt me-2"></i>Comprar Ahora
             </a>

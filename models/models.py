@@ -27,6 +27,7 @@ class Producto(db.Model):
     precio = db.Column(db.Float, nullable=False)
     imagen_url = db.Column(db.String(200))
     categoria_id = db.Column(db.Integer, db.ForeignKey('categoria.id'))
+    stock = db.Column(db.Integer, nullable=False, default=0)
 
 # 🔹 Pedidos
 class Pedido(db.Model):

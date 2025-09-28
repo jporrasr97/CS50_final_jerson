@@ -1,5 +1,6 @@
 {% extends "base.html" %}
-{% block title %}Productos{% endblock %}
+{% block title %}Productos</style>
+{% endblock %}
 
 {% block content %}
 <!-- Page Header -->
@@ -104,14 +105,31 @@
           </p>
 
           <div class="mt-auto">
-            <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
               <span class="h5 text-primary fw-bold mb-0">Q{{ producto.precio }}</span>
             </div>
 
-            <div class="d-flex gap-2">
-              <a href="{{ url_for('carrito.agregar_al_carrito', id=producto.id) }}" class="btn btn-outline-primary btn-sm flex-fill">
+            {% set stock = (producto.stock if producto.stock is not none else 0) %}
+            <p class="small mb-3 {{ 'text-success' if stock > 0 else 'text-danger' }}">
+              {{ 'En stock' if stock > 0 else 'Agotado' }}
+            </p>
+
+            <div class="d-grid gap-2">
+              <a href="{{ url_for('carrito.agregar_al_carrito', id=producto.id) }}"
+                 class="btn btn-outline-primary btn-sm flex-fill btn-add-to-cart"
+                 data-product-id="{{ producto.id }}"
+                 {% if stock <= 0 %}disabled aria-disabled="true"{% endif %}>
                 <i class="fas fa-cart-plus me-1"></i>Agregar al Carrito
               </a>
+
+              <div class="amazon-qty d-none" data-product-id="{{ producto.id }}">
+                <div class="input-group input-group-sm">
+                  <button type="button" class="btn btn-outline-secondary qty-minus" aria-label="Disminuir">−</button>
+                  <span class="form-control text-center bg-light qty-count">0</span>
+                  <button type="button" class="btn btn-outline-secondary qty-plus" aria-label="Aumentar">+</button>
+                </div>
+              </div>
+
               <a href="{{ url_for('carrito.comprar_ahora', id=producto.id) }}" class="btn btn-primary btn-sm flex-fill">
                 <i class="fas fa-bolt me-1"></i>Comprar Ahora
               </a>
@@ -187,8 +205,8 @@
   padding: 0;
 }
 
-</style>
 
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+
 </style>
 {% endblock %}

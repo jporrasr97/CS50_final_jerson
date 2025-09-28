@@ -1,11 +1,20 @@
 # routes/carrito.py
-from flask import Blueprint, render_template, session, redirect, url_for, flash, request, current_app
+from flask import Blueprint, render_template, session, redirect, url_for, flash, request, current_app, jsonify
 from flask_login import current_user, login_required
 from models.models import db, Producto, Pedido, OrderItem
 from flask_mail import Message
 from extensions import mail  # ver paso 2
 
 carrito_bp = Blueprint('carrito', __name__)
+
+def _get_cart_item(carrito, producto_id):
+    for item in carrito:
+        if item['id'] == producto_id:
+            return item
+    return None
+
+def _total_items():
+    return sum(item['cantidad'] for item in session.get("carrito", []))
 
 # inicializar carrito en la sesión si no existe
 def init_carrito():
@@ -23,20 +32,30 @@ def agregar_al_carrito(id):
     init_carrito()
     producto = Producto.query.get_or_404(id)
 
-    # buscar si ya está en el carrito
-    for item in session["carrito"]:
-        if item['id'] == producto.id:
-            item['cantidad'] += 1
-            break
-    else:
-        session["carrito"].append({
-            'id': producto.id,
-            'nombre': producto.nombre,
-            'precio': producto.precio,
-            'cantidad': 1
-        })
+    # Stock disponible (si la columna no existe aún en BD, asume alto para no bloquear)
+    stock_disp = getattr(producto, 'stock', None)
+    max_qty = stock_disp if isinstance(stock_disp, int) and stock_disp >= 0 else 999999
 
-    session.modified = True
+    # buscar si ya está en el carrito
+    item = _get_cart_item(session["carrito"], producto.id)
+    if item:
+        if item['cantidad'] >= max_qty:
+            flash("No hay suficiente stock para agregar más unidades de este producto.")
+        else:
+            item['cantidad'] += 1
+            session.modified = True
+    else:
+        if max_qty <= 0:
+            flash("Producto agotado.")
+        else:
+            session["carrito"].append({
+                'id': producto.id,
+                'nombre': producto.nombre,
+                'precio': producto.precio,
+                'cantidad': 1
+            })
+            session.modified = True
+
     # Redirigir de vuelta a la página de productos en lugar del carrito
     return redirect(url_for('productos.listar_productos'))
 
@@ -45,30 +64,46 @@ def comprar_ahora(id):
     init_carrito()
     producto = Producto.query.get_or_404(id)
 
-    # buscar si ya está en el carrito
-    for item in session["carrito"]:
-        if item['id'] == producto.id:
-            item['cantidad'] += 1
-            break
-    else:
-        session["carrito"].append({
-            'id': producto.id,
-            'nombre': producto.nombre,
-            'precio': producto.precio,
-            'cantidad': 1
-        })
+    # Respetar stock como en agregar_al_carrito
+    stock_disp = getattr(producto, 'stock', None)
+    max_qty = stock_disp if isinstance(stock_disp, int) and stock_disp >= 0 else 999999
 
-    session.modified = True
+    item = _get_cart_item(session["carrito"], producto.id)
+    if item:
+        if item['cantidad'] >= max_qty:
+            flash("No hay suficiente stock para agregar más unidades de este producto.")
+        else:
+            item['cantidad'] += 1
+            session.modified = True
+    else:
+        if max_qty <= 0:
+            flash("Producto agotado.")
+        else:
+            session["carrito"].append({
+                'id': producto.id,
+                'nombre': producto.nombre,
+                'precio': producto.precio,
+                'cantidad': 1
+            })
+            session.modified = True
+
     return redirect(url_for('carrito.ver_carrito'))
 
 @carrito_bp.route('/aumentar/<int:id>')
 def aumentar_cantidad(id):
     init_carrito()
+    producto = Producto.query.get_or_404(id)
+    stock_disp = getattr(producto, 'stock', None)
+    max_qty = stock_disp if isinstance(stock_disp, int) and stock_disp >= 0 else 999999
+
     for item in session["carrito"]:
         if item['id'] == id:
-            item['cantidad'] += 1
+            if item['cantidad'] >= max_qty:
+                flash("No hay suficiente stock para agregar más unidades de este producto.")
+            else:
+                item['cantidad'] += 1
+                session.modified = True
             break
-    session.modified = True
     return redirect(url_for('carrito.ver_carrito'))
 
 @carrito_bp.route('/disminuir/<int:id>')
@@ -88,6 +123,72 @@ def eliminar_del_carrito(id):
     session["carrito"] = [item for item in session["carrito"] if item['id'] != id]
     session.modified = True
     return redirect(url_for('carrito.ver_carrito'))
+
+# -----------------------------
+# API JSON para controles tipo Amazon
+# -----------------------------
+@carrito_bp.route('/api/carrito/estado', methods=['GET'])
+def api_carrito_estado():
+    init_carrito()
+    data = {
+        'items': {str(i['id']): i['cantidad'] for i in session["carrito"]},
+        'total_items': _total_items()
+    }
+    return jsonify(ok=True, **data), 200
+
+@carrito_bp.route('/api/carrito/agregar', methods=['POST'])
+def api_carrito_agregar():
+    init_carrito()
+    payload = request.get_json(silent=True) or {}
+    try:
+        producto_id = int(payload.get('id'))
+    except Exception:
+        return jsonify(ok=False, mensaje="ID inválido"), 400
+    delta = int(payload.get('delta', 1))
+    if delta == 0:
+        return jsonify(ok=True, cantidad=_get_cart_item(session["carrito"], producto_id)['cantidad'] if _get_cart_item(session["carrito"], producto_id) else 0, total_items=_total_items()), 200
+
+    producto = Producto.query.get_or_404(producto_id)
+    stock_disp = getattr(producto, 'stock', None)
+    max_qty = stock_disp if isinstance(stock_disp, int) and stock_disp >= 0 else 999999
+
+    item = _get_cart_item(session["carrito"], producto_id)
+    current = item['cantidad'] if item else 0
+    new_qty = current + delta
+
+    if new_qty <= 0:
+        # eliminar del carrito
+        session["carrito"] = [i for i in session["carrito"] if i['id'] != producto_id]
+        session.modified = True
+        return jsonify(ok=True, cantidad=0, total_items=_total_items(), stock=stock_disp), 200
+
+    if new_qty > max_qty:
+        # no exceder stock
+        if item:
+            item['cantidad'] = max_qty
+        else:
+            if max_qty > 0:
+                session["carrito"].append({
+                    'id': producto.id,
+                    'nombre': producto.nombre,
+                    'precio': producto.precio,
+                    'cantidad': max_qty
+                })
+        session.modified = True
+        return jsonify(ok=False, cantidad=max_qty, total_items=_total_items(), stock=stock_disp, mensaje="Stock insuficiente"), 200
+
+    # aplicar cambio
+    if item:
+        item['cantidad'] = new_qty
+    else:
+        session["carrito"].append({
+            'id': producto.id,
+            'nombre': producto.nombre,
+            'precio': producto.precio,
+            'cantidad': new_qty
+        })
+    session.modified = True
+    return jsonify(ok=True, cantidad=new_qty, total_items=_total_items(), stock=stock_disp), 200
 
 # ACEPTA GET y POST para evitar "Method Not Allowed" y enviar el pedido por correo
 @carrito_bp.route('/pedidos')
@@ -134,6 +235,24 @@ def checkout():
         return render_template('carrito.html', carrito=carrito, total=total,
                                direccion=direccion, telefono=telefono, email=email_cliente), 400
 
+    # Validar stock antes de crear el pedido
+    faltantes = []
+    for item in carrito:
+        producto = Producto.query.get(item['id'])
+        if not producto:
+            faltantes.append(f"Producto ID {item['id']} no encontrado.")
+            continue
+        stock_disp = getattr(producto, 'stock', None)
+        if isinstance(stock_disp, int):
+            if item['cantidad'] > stock_disp:
+                faltantes.append(f"{producto.nombre}: stock disponible {stock_disp}, solicitado {item['cantidad']}.")
+
+    if faltantes:
+        for f in faltantes:
+            flash(f)
+        return render_template('carrito.html', carrito=carrito, total=total,
+                               direccion=direccion, telefono=telefono, email=email_cliente), 400
+
     # Guardar pedido en BD
     nuevo_pedido = Pedido(
         usuario_id=current_user.id if current_user.is_authenticated else None,
@@ -143,7 +262,7 @@ def checkout():
     db.session.add(nuevo_pedido)
     db.session.flush()  # Para obtener el ID del pedido
 
-    # Guardar items del pedido
+    # Guardar items del pedido y descontar stock
     for item in carrito:
         producto = Producto.query.get(item['id'])
         order_item = OrderItem(
@@ -153,6 +272,10 @@ def checkout():
             precio_unitario=item['precio']
         )
         db.session.add(order_item)
+        # descontar stock si la columna existe
+        stock_disp = getattr(producto, 'stock', None)
+        if isinstance(stock_disp, int):
+            producto.stock = max(0, stock_disp - item['cantidad'])
 
     db.session.commit()
 

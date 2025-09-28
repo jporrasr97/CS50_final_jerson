@@ -96,6 +96,45 @@ Order confirmations are sent via email using Flask-Mail. The system constructs b
    MAIL_DEFAULT_SENDER=your-email@gmail.com
    ```
 
+## Conda environment (alternative to venv)
+
+If you prefer Conda over Python venv, use the provided environment.yml.
+
+1) Create and activate the Conda environment:
+   ```
+   conda env create -f environment.yml
+   conda activate tienda
+   ```
+   - To update later:
+     ```
+     conda env update -f environment.yml --prune
+     ```
+   - To remove:
+     ```
+     conda remove -n tienda --all
+     ```
+
+2) Prepare environment variables:
+   ```
+   copy .env.example .env   # Windows
+   # or:
+   cp .env.example .env     # macOS/Linux
+   ```
+   Edit .env with your secrets (Gmail app password, etc.)
+
+3) Initialize the database:
+   ```
+   python init_db.py
+   ```
+
+4) Run the app:
+   ```
+   python app.py
+   ```
+   Then open http://localhost:5000
+
+Note: environment.yml pins Python 3.11 and installs all pip dependencies (Flask, SQLAlchemy, Flask-Mail, etc.) inside the Conda env.
+
 ## Setup
 
 ### Database Initialization
