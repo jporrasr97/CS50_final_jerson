@@ -1,6 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Productos</style>
-{% endblock %}
+{% block title %}Productos{% endblock %}
 
 {% block content %}
 <!-- Page Header -->
@@ -96,41 +95,33 @@
             <span class="badge bg-light text-dark mb-2 align-self-start">{{ producto.categoria.nombre }}</span>
           {% endif %}
 
-          <h5 class="card-title mb-2 fw-bold text-truncate" title="{{ producto.nombre }}">
+          <h5 class="card-title mb-1 fw-bold text-truncate" title="{{ producto.nombre }}">
             {{ producto.nombre }}
           </h5>
 
-          <p class="card-text text-muted small mb-3 flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+          <div class="d-flex align-items-baseline justify-content-between mt-1">
+            <span class="h5 fw-bold mb-0 text-primary">Q{{ producto.precio }}</span>
+          </div>
+
+          {% set stock = (producto.stock if producto.stock is not none else 0) %}
+          <p class="small mb-2 {{ 'text-success' if stock > 0 else 'text-danger' }}">
+            {{ 'En stock' if stock > 0 else 'Agotado' }}
+          </p>
+
+          <p class="card-text text-muted small mb-3 flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
             {{ producto.descripcion }}
           </p>
 
           <div class="mt-auto">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <span class="h5 text-primary fw-bold mb-0">Q{{ producto.precio }}</span>
-            </div>
-
-            {% set stock = (producto.stock if producto.stock is not none else 0) %}
-            <p class="small mb-3 {{ 'text-success' if stock > 0 else 'text-danger' }}">
-              {{ 'En stock' if stock > 0 else 'Agotado' }}
-            </p>
-
-            <div class="d-grid gap-2">
+            <div class="d-grid gap-3">
               <a href="{{ url_for('carrito.agregar_al_carrito', id=producto.id) }}"
-                 class="btn btn-outline-primary btn-sm flex-fill btn-add-to-cart"
+                 class="btn flex-fill btn-add-to-cart btn-block-mobile"
                  data-product-id="{{ producto.id }}"
                  {% if stock <= 0 %}disabled aria-disabled="true"{% endif %}>
                 <i class="fas fa-cart-plus me-1"></i>Agregar al Carrito
               </a>
 
-              <div class="amazon-qty d-none" data-product-id="{{ producto.id }}">
-                <div class="input-group input-group-sm">
-                  <button type="button" class="btn btn-outline-secondary qty-minus" aria-label="Disminuir">−</button>
-                  <span class="form-control text-center bg-light qty-count">0</span>
-                  <button type="button" class="btn btn-outline-secondary qty-plus" aria-label="Aumentar">+</button>
-                </div>
-              </div>
-
-              <a href="{{ url_for('carrito.comprar_ahora', id=producto.id) }}" class="btn btn-primary btn-sm flex-fill">
+              <a href="{{ url_for('carrito.comprar_ahora', id=producto.id) }}" class="btn btn-buy-now flex-fill btn-block-mobile">
                 <i class="fas fa-bolt me-1"></i>Comprar Ahora
               </a>
             </div>

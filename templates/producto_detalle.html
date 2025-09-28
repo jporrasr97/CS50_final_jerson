@@ -64,7 +64,7 @@
           </p>
           <div class="d-grid gap-3">
             <a href="{{ url_for('carrito.agregar_al_carrito', id=producto.id) }}"
-               class="btn btn-outline-primary btn-lg btn-add-to-cart"
+               class="btn btn-outline-primary btn-lg btn-add-to-cart btn-block-mobile"
                data-product-id="{{ producto.id }}"
                {% if stock <= 0 %}disabled aria-disabled="true"{% endif %}>
               <i class="fas fa-cart-plus me-2"></i>Agregar al Carrito
@@ -78,7 +78,7 @@
               </div>
             </div>
 
-            <a href="{{ url_for('carrito.comprar_ahora', id=producto.id) }}" class="btn btn-primary btn-lg">
+            <a href="{{ url_for('carrito.comprar_ahora', id=producto.id) }}" class="btn btn-buy-now btn-lg btn-block-mobile">
               <i class="fas fa-bolt me-2"></i>Comprar Ahora
             </a>
           </div>

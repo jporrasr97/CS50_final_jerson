@@ -84,13 +84,15 @@ body {
 
 /* Add to cart button */
 .btn-add-to-cart {
-  border-color: var(--accent);
-  color: var(--accent-dark);
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
 }
-.btn-add-to-cart:hover {
-  background: var(--accent);
-  color: #111;
-  border-color: var(--accent);
+.btn-add-to-cart:hover,
+.btn-add-to-cart:focus {
+  background: #0b5ed7;
+  border-color: #0a58ca;
+  color: #fff;
 }
 
 /* Primary actions */
@@ -366,4 +368,73 @@ body {
 @media (max-width: 991.98px) {
   .navbar-nav { gap: 10px; }
   .navbar-nav .nav-link { padding: 8px 10px; }
+}
+/* UI refinements for hero buttons, product actions, and typography */
+
+/* Strong hierarchy for primary/secondary CTAs in hero */
+.btn-hero-primary {
+  background: #111;
+  border-color: #111;
+  color: #fff;
+}
+.btn-hero-primary:hover,
+.btn-hero-primary:focus {
+  background: #000;
+  border-color: #000;
+  color: #fff;
+}
+.btn-hero-secondary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: transparent;
+  color: #fff;
+}
+.btn-hero-secondary:hover,
+.btn-hero-secondary:focus {
+  filter: brightness(0.95);
+  color: #fff;
+}
+
+/* Buy now: Amazon-like orange, full contrast */
+.btn-buy-now {
+  background: #ffa41c;
+  border-color: #ffa41c;
+  color: #111;
+}
+.btn-buy-now:hover,
+.btn-buy-now:focus {
+  background: #f09000;
+  border-color: #f09000;
+  color: #111;
+}
+
+/* Strengthen price prominence in cards */
+.product-card .h5.text-primary {
+  font-weight: 800;
+}
+
+/* Make product card content left-aligned for consistency */
+.product-card .card-body {
+  text-align: left;
+}
+
+/* Full-width buttons helper for mobile */
+@media (max-width: 575.98px) {
+  .btn-block-mobile {
+    width: 100% !important;
+    display: block !important;
+  }
+
+  /* Larger, more legible titles and prices on phones */
+  .product-card .card-title {
+    font-size: 1.1rem;
+  }
+  .product-card .h5.text-primary {
+    font-size: 1.35rem;
+  }
+
+  /* Slightly larger body text for readability */
+  .card-text.small,
+  .text-muted.small {
+    font-size: 0.95rem;
+  }
 }
