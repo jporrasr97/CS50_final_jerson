@@ -58,6 +58,42 @@ body {
 .h2.text-primary {
   color: #b12704 !important; /* Amazon price color */
 }
+
+/* Old price (tachado) and discount visuals */
+.price-old {
+  text-decoration: line-through;
+  color: #6c757d;
+  font-weight: 500;
+}
+.discount-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: #dc3545;
+  color: #fff;
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(220,53,69,0.25);
+}
+.discount-chip {
+  color: #dc3545;
+  background: rgba(220,53,69,0.08);
+  border: 1px solid rgba(220,53,69,0.25);
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+/* Brand/Seller lines */
+.brand-line, .seller-line {
+  line-height: 1.1;
+  margin-top: 2px;
+}
+
+/* Stock state */
 .stock-ok {
   color: #007600;
 }

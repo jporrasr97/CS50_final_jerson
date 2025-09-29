@@ -16,6 +16,9 @@ def _get_cart_item(carrito, producto_id):
 def _total_items():
     return sum(item['cantidad'] for item in session.get("carrito", []))
 
+def _cart_total():
+    return sum(item['precio'] * item['cantidad'] for item in session.get("carrito", []))
+
 # inicializar carrito en la sesión si no existe
 def init_carrito():
     if "carrito" not in session:
@@ -132,7 +135,8 @@ def api_carrito_estado():
     init_carrito()
     data = {
         'items': {str(i['id']): i['cantidad'] for i in session["carrito"]},
-        'total_items': _total_items()
+        'total_items': _total_items(),
+        'total': _cart_total()
     }
     return jsonify(ok=True, **data), 200
 
@@ -146,7 +150,7 @@ def api_carrito_agregar():
         return jsonify(ok=False, mensaje="ID inválido"), 400
     delta = int(payload.get('delta', 1))
     if delta == 0:
-        return jsonify(ok=True, cantidad=_get_cart_item(session["carrito"], producto_id)['cantidad'] if _get_cart_item(session["carrito"], producto_id) else 0, total_items=_total_items()), 200
+        return jsonify(ok=True, cantidad=_get_cart_item(session["carrito"], producto_id)['cantidad'] if _get_cart_item(session["carrito"], producto_id) else 0, total_items=_total_items(), total=_cart_total()), 200
 
     producto = Producto.query.get_or_404(producto_id)
     stock_disp = getattr(producto, 'stock', None)
@@ -160,7 +164,7 @@ def api_carrito_agregar():
         # eliminar del carrito
         session["carrito"] = [i for i in session["carrito"] if i['id'] != producto_id]
         session.modified = True
-        return jsonify(ok=True, cantidad=0, total_items=_total_items(), stock=stock_disp), 200
+        return jsonify(ok=True, cantidad=0, total_items=_total_items(), total=_cart_total(), stock=stock_disp), 200
 
     if new_qty > max_qty:
         # no exceder stock
@@ -175,7 +179,7 @@ def api_carrito_agregar():
                     'cantidad': max_qty
                 })
         session.modified = True
-        return jsonify(ok=False, cantidad=max_qty, total_items=_total_items(), stock=stock_disp, mensaje="Stock insuficiente"), 200
+        return jsonify(ok=False, cantidad=max_qty, total_items=_total_items(), total=_cart_total(), stock=stock_disp, mensaje="Stock insuficiente"), 200
 
     # aplicar cambio
     if item:
@@ -188,7 +192,7 @@ def api_carrito_agregar():
             'cantidad': new_qty
         })
     session.modified = True
-    return jsonify(ok=True, cantidad=new_qty, total_items=_total_items(), stock=stock_disp), 200
+    return jsonify(ok=True, cantidad=new_qty, total_items=_total_items(), total=_cart_total(), stock=stock_disp), 200
 
 # ACEPTA GET y POST para evitar "Method Not Allowed" y enviar el pedido por correo
 @carrito_bp.route('/pedidos')

@@ -78,7 +78,7 @@
   {% if productos %}
   <div class="row g-4">
     {% for producto in productos %}
-    <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="col-6 col-md-6 col-lg-4 col-xl-3">
       <div class="product-card card h-100 border-0 shadow-sm hover-lift">
         <div class="product-image-container position-relative overflow-hidden" style="height: 250px;">
           <a href="{{ url_for('productos.detalle_producto', id=producto.id) }}" class="d-block h-100">
@@ -88,11 +88,21 @@
               <img src="{{ url_for('static', filename='img/no-image.png') }}" class="card-img-top w-100 h-100 object-fit-cover product-image" alt="Sin imagen" style="cursor: pointer;">
             {% endif %}
           </a>
+          {% if producto.precio_anterior is defined and producto.precio_anterior and producto.precio_anterior > producto.precio %}
+            {% set desc = ((producto.precio_anterior - producto.precio) / producto.precio_anterior * 100) | round(0, 'floor') %}
+            <div class="discount-badge">-{{ desc }}%</div>
+          {% endif %}
         </div>
 
         <div class="card-body d-flex flex-column p-3">
           {% if producto.categoria %}
             <span class="badge bg-light text-dark mb-2 align-self-start">{{ producto.categoria.nombre }}</span>
+          {% endif %}
+          {% if producto.marca is defined and producto.marca %}
+            <div class="text-muted small brand-line">{{ producto.marca }}</div>
+          {% endif %}
+          {% if producto.vendedor is defined and producto.vendedor %}
+            <div class="text-muted small seller-line">Vendedor: {{ producto.vendedor }}</div>
           {% endif %}
 
           <h5 class="card-title mb-1 fw-bold text-truncate" title="{{ producto.nombre }}">
@@ -100,8 +110,20 @@
           </h5>
 
           <div class="d-flex align-items-baseline justify-content-between mt-1">
-            <span class="h5 fw-bold mb-0 text-primary">Q{{ producto.precio }}</span>
+            <div>
+              <span class="price-current h5 fw-bold text-primary">Q{{ producto.precio }}</span>
+              {% if producto.precio_anterior is defined and producto.precio_anterior and producto.precio_anterior > producto.precio %}
+                <span class="price-old ms-2">Q{{ producto.precio_anterior }}</span>
+              {% endif %}
+            </div>
+            {% if producto.precio_anterior is defined and producto.precio_anterior and producto.precio_anterior > producto.precio %}
+              {% set desc = ((producto.precio_anterior - producto.precio) / producto.precio_anterior * 100) | round(0, 'floor') %}
+              <span class="discount-chip">-{{ desc }}%</span>
+            {% endif %}
           </div>
+          {% if producto.oferta_hasta is defined and producto.oferta_hasta %}
+            <div class="text-danger small mt-1">Válido hasta {{ producto.oferta_hasta }}</div>
+          {% endif %}
 
           {% set stock = (producto.stock if producto.stock is not none else 0) %}
           <p class="small mb-2 {{ 'text-success' if stock > 0 else 'text-danger' }}">
@@ -115,10 +137,10 @@
           <div class="mt-auto">
             <div class="d-grid gap-3">
               <a href="{{ url_for('carrito.agregar_al_carrito', id=producto.id) }}"
-                 class="btn flex-fill btn-add-to-cart btn-block-mobile"
+                 class="btn btn-add-to-cart btn-lg w-100 btn-block-mobile text-center"
                  data-product-id="{{ producto.id }}"
                  {% if stock <= 0 %}disabled aria-disabled="true"{% endif %}>
-                <i class="fas fa-cart-plus me-1"></i>Agregar al Carrito
+                <i class="fas fa-cart-plus me-1"></i>Agregar
               </a>
 
               <a href="{{ url_for('carrito.comprar_ahora', id=producto.id) }}" class="btn btn-buy-now flex-fill btn-block-mobile">
