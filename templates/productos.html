@@ -76,11 +76,11 @@
 
   <!-- Products Grid -->
   {% if productos %}
-  <div class="row g-4">
+  <div class="row g-2">
     {% for producto in productos %}
     <div class="col-6 col-md-6 col-lg-4 col-xl-3">
       <div class="product-card card h-100 border-0 shadow-sm hover-lift">
-        <div class="product-image-container position-relative overflow-hidden" style="height: 250px;">
+        <div class="product-image-container position-relative overflow-hidden">
           <a href="{{ url_for('productos.detalle_producto', id=producto.id) }}" class="d-block h-100">
             {% if producto.imagen_url %}
               <img src="{{ producto.imagen_url }}" class="card-img-top w-100 h-100 object-fit-cover product-image" alt="{{ producto.nombre }}" style="cursor: pointer;">
