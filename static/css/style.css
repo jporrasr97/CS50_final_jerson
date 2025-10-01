@@ -45,10 +45,10 @@ body {
   transform: translateY(-4px);
   box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
 }
-.product-image-container {
+/* Card-only image container sizing */
+.product-card .product-image-container {
   border-radius: 12px 12px 0 0;
   background: #fff;
-
   height: 200px;
 }
 .product-image {
@@ -377,7 +377,7 @@ body {
   .hero-section .lead { font-size: 1rem; }
 
   /* Product card compact layout */
-  .product-image-container { height: 120px !important; }
+  .product-card .product-image-container { height: 120px !important; }
   .product-card .card-body { padding: 0.75rem !important; }
   .product-card .card-title { font-size: 1rem; }
   .product-card .btn { font-size: 0.9rem; }
@@ -389,7 +389,7 @@ body {
   .product-image-container .img-fluid {
     max-height: 320px !important;
     height: auto !important;
-    width: auto;
+    width: 100%;
     max-width: 100%;
   }
 
@@ -398,7 +398,7 @@ body {
 }
 @media (min-width: 576px) and (max-width: 767.98px) {
   /* Slightly taller card images for small phones/landscape */
-  .product-image-container { height: 160px !important; }
+  .product-card .product-image-container { height: 160px !important; }
 }
 
 /* Reduce spacing in collapsed navbar when menu is open on mobile/tablet */
